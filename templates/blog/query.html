@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>账目查询</title>
+    <!-- 引入 echarts.js -->
+     {% load static %}
+    <script src="{% static 'jquery.js' %}"></script>
+    <script src="{% static 'echarts.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var date = new Date();
+            var startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            var endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            var sDate = startDate.getFullYear() + "-" + ("0" + (startDate.getMonth() + 1)).slice(-2) + '-' + ("0" + startDate.getDate()).slice(-2);
+            var eDate = endDate.getFullYear() + "-" + ("0" + (endDate.getMonth() + 1)).slice(-2) + '-' + ("0" + endDate.getDate()).slice(-2);
+            $('#start').val(sDate);
+            $('#end').val(eDate);
+        })
+
+
+		function query() {
+            var sd = document.getElementById("start").value;
+            var ed = document.getElementById("end").value;
+            var sDate = new Date(sd);
+            var eDate = new Date(ed);
+            if (sDate > eDate) {
+                alert('起始日期不得大于终止日期');
+            }
+            else {
+                data = sumData(sourceData, sDate, eDate);
+                option.legend.data = data.legendData;
+                option.series[0].data = data.seriesData;
+                s = sDate.getFullYear() + '年' + (sDate.getMonth()+1) + '月' + sDate.getDate() + '日';
+                e = eDate.getFullYear() + '年' + (eDate.getMonth()+1) + '月' + eDate.getDate() + '日';
+                option.title.subtext = s + '-' + e;
+                pieChart.setOption(option,true);
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div>
+            <h3><a href="/person">支出</a></h3>
+            <h3><a href="/income">收入</a></h3>
+            <h3>查询</h3>
+    </div>
+    <div>
+        {% for i in result%}
+        <div>
+            {{i.fields.date}}&nbsp &nbsp
+            {{i.fields.type}}&nbsp &nbsp
+            {{i.fields.number}}&nbsp &nbsp
+            {{i.fields.content}}&nbsp &nbsp
+        </div>
+        {% endfor %}
+    </div>
+
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <!-- 饼图，支持设定起止日期 -->
+    <div>
+        <div id="choosedate">
+            起始日期<input type="date" id="start" >
+            结束日期<input type="date" id="end" >
+            <input type="button" value="查询" onclick="query()" >
+        </div>
+        <div id="pie" style="width: 900px;height:600px;" ></div>
+    </div>
+    <!-- 折线图 -->
+    <div id="line" style="width: 900px;height:600px;" ></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var pieChart = echarts.init(document.getElementById('pie'));
+        var lineChart = echarts.init(document.getElementById('line'));
+
+        // 指定图表的配置项和数据
+        var sourceData = new Array();
+        var sourceData = {{ result|safe }};
+        //console.log(sourceData);
+
+		//var startDate = "2020/01/01";
+		//var endDate = "2020/01/31";
+        var date = new Date();
+        var startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        var endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+        var startDay = startDate.getFullYear() + '年' + (startDate.getMonth() + 1) + '月' + startDate.getDate() + '日';
+        var endDay = endDate.getFullYear() + '年' + (endDate.getMonth() + 1) + '月' + endDate.getDate() + '日';
+
+		var data = sumData(sourceData, startDate, endDate);
+		var data2 = lineData(sourceData, date);
+
+		option = {
+			title : {
+				text: '支出统计',
+				subtext: startDay + '-' + endDay,
+				x:'center'
+			},
+//			tooltip : {
+//				trigger: 'item',
+//				formatter: "{a} <br/>{b} : {c}元 ({d}%)"
+//			},
+			legend: {
+				type: 'scroll',
+				orient: 'vertical',
+				right: 10,
+				top: 20,
+				bottom: 20,
+				data: data.legendData,
+
+				// selected: data.selected
+			},
+			series: [
+				{
+					name: '支出类别',
+					type: 'pie',
+					radius: ['30%', '55%'],
+					// center: ['40%', '50%'],
+					data: data.seriesData,
+					label: {
+						normal: {
+							show: true,
+							formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}元  {per|{d}%}  ',
+							backgroundColor: '#eee',
+							borderColor: '#aaa',
+							borderWidth: 1,
+							borderRadius: 4,
+							// shadowBlur:3,
+							// shadowOffsetX: 2,
+							// shadowOffsetY: 2,
+							// shadowColor: '#999',
+							// padding: [0, 7],
+							rich: {
+								a: {
+									color: '#999',
+									lineHeight: 22,
+									align: 'center'
+								},
+								// abg: {
+								//     backgroundColor: '#333',
+								//     width: '100%',
+								//     align: 'right',
+								//     height: 22,
+								//     borderRadius: [4, 4, 0, 0]
+								// },
+								hr: {
+									borderColor: '#aaa',
+									width: '100%',
+									borderWidth: 0.5,
+									height: 0
+								},
+								b: {
+									fontSize: 16,
+									lineHeight: 33
+								},
+								per: {
+									color: '#eee',
+									backgroundColor: '#334455',
+									padding: [2, 4],
+									borderRadius: 2
+								}
+							}
+						},
+						emphasis: {
+							show: true,
+							position: 'center',
+							textStyle: {
+								fontSize: '30',
+								fontWeight: 'bold'
+							}
+						}
+					},
+					itemStyle: {
+						emphasis: {
+							shadowBlur: 10,
+							shadowOffsetX: 0,
+							shadowColor: 'rgba(0, 0, 0, 0.5)'
+						}
+					}
+				}
+			]
+		};
+
+		option2 = {
+            xAxis: {
+                type: 'category',
+                data: data2.legendData,
+                inverse: true,
+                name: '月份',
+                nameLocation: 'start'
+            },
+            yAxis: {
+                type: 'value',
+                name: '当月支出：元'
+            },
+            series: [{
+                data: data2.seriesData,
+                type: 'line'
+            }]
+        };
+
+
+		function sumData(sourceData, startDate, endDate) {
+			var legendData = [];
+			var seriesData = [];
+
+			var classSum = {
+				"餐饮支出" : 0.0,
+				"交通支出" : 0.0,
+				"购物支出" : 0.0,
+				"娱乐支出" : 0.0,
+				"医教支出" : 0.0,
+				"居家支出" : 0.0,
+				"投资支出" : 0.0,
+				"人情支出" : 0.0,
+				"生意支出" : 0.0,
+				"其他支出" : 0.0,
+			};
+
+			var start = new Date(startDate);
+			var end = new Date(endDate);
+
+			for (var i in sourceData) {
+				var d = new Date(sourceData[i].fields.date);
+				if (d < start || d > end)
+					continue;
+				classSum[sourceData[i].fields.type] += parseFloat(sourceData[i].fields.number);
+			}
+
+			for (var k in classSum) {
+				if (classSum[k] < 0.1)
+					continue;
+				legendData.push(k);
+				seriesData.push({
+					name: k,
+					value: classSum[k].toFixed(2)
+				});
+			}
+
+			function sortPay(a,b){
+				return b.value-a.value
+			}
+
+			seriesData.sort(sortPay)
+
+			return {
+				legendData: legendData,
+				seriesData: seriesData
+			};
+		}
+
+				function lineData(sourceData, endDate) {
+            var legendData = [];
+            var seriesData = [];
+
+            var monthNum = 6;
+            var end = new Date(endDate.getFullYear(), endDate.getMonth()+1, 0);
+            var start = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+            //console.log(end);
+            //console.log(start);
+
+            var monthSum = new Array();
+            for (var i = 0; i < monthNum; i++)
+            {
+                var text = start.getFullYear() + '-' + (start.getMonth()+1);
+                monthSum[text] = 0.0;
+                start.setMonth(start.getMonth()-1, 1);
+            }
+            //console.log(monthSum);
+
+            for (var i in sourceData) {
+                var d = new Date(sourceData[i].fields.date);
+				if (d < start || d > end)
+					continue;
+				var cur = d.getFullYear() + '-' + (d.getMonth()+1);
+				monthSum[cur] += parseFloat(sourceData[i].fields.number);
+            }
+
+            for (var k in monthSum) {
+				legendData.push(k);
+				seriesData.push(monthSum[k].toFixed(2));
+			}
+
+            return {
+				legendData: legendData,
+				seriesData: seriesData
+			};
+        }
+
+        // 使用刚指定的配置项和数据显示图表。
+        pieChart.setOption(option,true);
+		lineChart.setOption(option2);
+    </script>
+
+</body>
+</html>
