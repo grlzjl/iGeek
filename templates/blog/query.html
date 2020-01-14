@@ -90,11 +90,23 @@
 </head>
 <body>
     <div class="container">
-            <h3><a href="/person">支出</a></h3>
-            <h3><a href="/income">收入</a></h3>
-            <h3>查询</h3>
+        <h3><a href="/person">支出</a></h3>
+        <h3><a href="/income">收入</a></h3>
+        <h3><a href="#">查询</a></h3>
     </div>
     <div class="info">
+        <table>
+          <tr>
+            <td width="200px">账户余额：</td>
+            <td width="200px">支出合计：</td>
+            <td width="200px">收入合计：</td>
+          </tr>
+          <tr>
+            <td width="200px">{{sum}}元</td>
+            <td width="200px">{{sumOut}}元</td>
+            <td width="200px">{{sumIn}}元</td>
+          </tr>
+        </table>
         {% for i in result%}
         <div class="xx">
             {{i.fields.date}}&nbsp &nbsp
@@ -270,6 +282,8 @@
 			var end = new Date(endDate);
 
 			for (var i in sourceData) {
+			    if (sourceData[i].fields.type == '工资收入'||sourceData[i].fields.type == '副业收入'||sourceData[i].fields.type == '投资收入'||sourceData[i].fields.type == '其他收入')
+			        continue;
 				var d = new Date(sourceData[i].fields.date);
 				if (d < start || d > end)
 					continue;
@@ -298,7 +312,7 @@
 			};
 		}
 
-				function lineData(sourceData, endDate) {
+		function lineData(sourceData, endDate) {
             var legendData = [];
             var seriesData = [];
 
@@ -318,6 +332,8 @@
             //console.log(monthSum);
 
             for (var i in sourceData) {
+			    if (sourceData[i].fields.type == '工资收入'||sourceData[i].fields.type == '副业收入'||sourceData[i].fields.type == '投资收入'||sourceData[i].fields.type == '其他收入')
+			        continue;
                 var d = new Date(sourceData[i].fields.date);
 				if (d < start || d > end)
 					continue;

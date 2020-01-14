@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import *
 from django.core import serializers
 from . import models
+import json
 
 def index(request):
     return render(request, 'blog/index.html')
@@ -61,8 +62,21 @@ def query(request):
         print(2)
         return JsonResponse({'status': 1, 'message': "请先登录"})
     result = serializers.serialize("json", models.BlogInfo.objects.filter(user_id=cookie))
+    result1 = json.loads(result)
     if result:
-        return render(request, 'blog/query.html', {'result': eval(result)})
+        sumIn = 0.0
+        sumOut = 0.0
+        inType = ['工资收入','副业收入','投资收入','其他收入']
+        for i in result1:
+            if i['fields']['type'] in inType:
+                sumIn += float(i['fields']['number'])
+            else:
+                sumOut += float(i['fields']['number'])
+        sumIn = round(sumIn, 2)
+        sumOut = round(sumOut, 2)
+        sum = round(sumIn - sumOut, 2)
+
+        return render(request, 'blog/query.html', {'result': eval(result), 'sum': sum, 'sumIn': sumIn, 'sumOut': sumOut})
     else:
         return render(request, 'blog/query.html', {'result': eval(result)})
 
