@@ -2,6 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <style type="text/css">
+    *{
+    	padding: 0;
+    	margin: 0;
+    	box-sizing:border-box;
+    	font-family: "微软雅黑"
+    }
+    body{
+    	background: #8061da;
+    	padding: 20px;
+    	color: #ffffff;
+    }
+    .container h3{
+    	float: left;
+    	margin-right: 20px;
+    	height: 30px;
+    	width: 80px;
+    	text-align: center;
+    	background: #edd255;
+    	border-radius: 10px;
+    	margin: 20px;
+    }
+      .container h3 a,.container h3{
+      	text-decoration: none;
+      	color: white;
+      }
+    .info{
+    	clear: both;
+    	margin-bottom: 20px;
+    }
+    .xx{
+    	background: #9d89dd;
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+    .btn{
+    	height: 30px;
+    	width: 80px;
+    	text-align: center;
+    	background: #edd255;
+    	border-radius: 10px;
+    	margin: 20px;
+    	border:none;
+    	font-size: 16px;
+    	color: white;
+    }
+    </style>
     <title>账目查询</title>
     <!-- 引入 echarts.js -->
      {% load static %}
@@ -42,14 +89,14 @@
     </script>
 </head>
 <body>
-    <div>
+    <div class="container">
             <h3><a href="/person">支出</a></h3>
             <h3><a href="/income">收入</a></h3>
             <h3>查询</h3>
     </div>
-    <div>
+    <div class="info">
         {% for i in result%}
-        <div>
+        <div class="xx">
             {{i.fields.date}}&nbsp &nbsp
             {{i.fields.type}}&nbsp &nbsp
             {{i.fields.number}}&nbsp &nbsp
@@ -64,7 +111,7 @@
         <div id="choosedate">
             起始日期<input type="date" id="start" >
             结束日期<input type="date" id="end" >
-            <input type="button" value="查询" onclick="query()" >
+            <input class="btn" type="button" value="查询" onclick="query()" >
         </div>
         <div id="pie" style="width: 900px;height:600px;" ></div>
     </div>

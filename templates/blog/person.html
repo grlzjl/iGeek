@@ -2,6 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <style type="text/css">
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing:border-box;
+        font-family: "微软雅黑"
+    }
+    body{
+        background: #8061da;
+        padding: 20px;
+        color: #ffffff;
+    }
+    .container h3{
+        float: left;
+        margin-right: 20px;
+        height: 30px;
+        width: 80px;
+        text-align: center;
+        background: #edd255;
+        border-radius: 10px;
+        margin: 20px;
+    }
+      .container h3 a,.container h3{
+        text-decoration: none;
+        color: white;
+      }
+    .info{
+        clear: both;
+        margin-bottom: 20px;
+    }
+    .xx{
+        background: #9d89dd;
+    }
+    .btn{
+        height: 30px;
+        width: 80px;
+        text-align: center;
+        background: #edd255;
+        border-radius: 10px;
+        margin: 20px;
+        border:none;
+        font-size: 16px;
+        color: white;
+    }
+    </style>
     <title>个人中心</title>
     {% load static %}
     <script src="{% static 'jquery.js' %}"></script>
@@ -43,12 +88,12 @@
 
     <div id="result"></div>
     <div>
-        <div>
+        <div class="container">
             <h3>支出</h3>
             <h3><a href="/income">收入</a></h3>
             <h3><a href="/query">查询</a></h3>
         </div>
-        <form>
+        <form class="info">
             <h3>时间</h3>
             <input type="date" id="date"  required >
             <h3>数量</h3>
@@ -69,7 +114,7 @@
             </select>
              <h3>备注</h3>
             <input type="text" id="content"  >
-            <input type="button" id="record" value="保存" >
+            <input type="button" id="record" value="保存" class="btn">
         </form>
     </div>
 
